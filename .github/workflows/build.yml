@@ -13,6 +13,9 @@ jobs:
       - name: Giải nén dự án
         run: unzip -q twc-watchface-loader.zip
 
+      - name: Sửa lỗi trùng tên hàm onStart
+        run: sed -i 's/onStart()/onStartClicked()/g' twc-watchface-loader/app/src/main/java/com/twc/loader/MainActivity.java
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
