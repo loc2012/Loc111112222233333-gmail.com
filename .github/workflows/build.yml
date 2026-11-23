@@ -13,6 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Tìm thư mục dự án
+        id: p
+        run: |
+          f=$(find . -name settings.gradle.kts | head -1)
+          if [ -z "$f" ]; then
+            echo "KHÔNG thấy settings.gradle.kts trong repo. Các file hiện có:"
+            find . -not -path './.git/*' -type f | head -50
+            exit 1
+          fi
+          echo "dir=$(dirname "$f")" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -26,10 +37,11 @@ jobs:
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
 
       - name: Build debug APK
+        working-directory: ${{ steps.p.outputs.dir }}
         run: gradle assembleDebug --stacktrace
 
       - name: Đổi tên APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk TWC-Watchface-Loader.apk
+        run: cp "${{ steps.p.outputs.dir }}/app/build/outputs/apk/debug/app-debug.apk" TWC-Watchface-Loader.apk
 
       - uses: actions/upload-artifact@v4
         with:
