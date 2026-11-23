@@ -13,12 +13,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Giải nén zip
+        run: |
+          z=$(find . -maxdepth 2 -name 'twc-watchface-loader*.zip' | head -1)
+          if [ -n "$z" ]; then
+            mkdir -p _src
+            unzip -q -o "$z" -d _src
+          fi
+
       - name: Tìm thư mục dự án
         id: p
         run: |
-          f=$(find . -name settings.gradle.kts | head -1)
+          f=$(find . -name settings.gradle.kts -not -path './.git/*' | head -1)
           if [ -z "$f" ]; then
-            echo "KHÔNG thấy settings.gradle.kts trong repo. Các file hiện có:"
+            echo "KHÔNG thấy settings.gradle.kts. Các file hiện có:"
             find . -not -path './.git/*' -type f | head -50
             exit 1
           fi
